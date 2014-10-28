@@ -4,8 +4,8 @@
   "description": "jstranform for es6 modules syntax",
   "main": "index.js",
   "dependencies": {
-    "esprima-fb": "~3001.1.0-dev-harmony-fb",
-    "jstransform": "~3.0.0"
+    "esprima-fb": "~7001.0001.0000-dev-harmony-fb",
+    "jstransform": "~7.0.0"
   },
   "devDependencies": {
     "semver": "~2.2.1",
