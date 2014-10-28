@@ -16,7 +16,54 @@ var utils   = require('jstransform/src/utils');
 function visitImportDeclaration(traverse, node, path, state) {
   var specifier, name;
   utils.catchup(node.range[0], state);
+  var modID;
+  if (node.specifiers.length === 0) {
+    utils.append('require(' + node.source.raw + ');', state);
+  }
+  else if (node.specifiers.length === 1) {
+    specifier = node.specifiers[0];
+    name = specifier.name ? specifier.name.name : specifier.id.name;
+    modID = 'require(' + node.source.raw + ')';
+    switch (specifier.type) {
+          case Syntax.ImportDefaultSpecifier:
+            utils.append('var ' + name + ' = ' + modID +  ';', state); // TODO: should import modID.default
+            break;
+          case Syntax.ImportNamespaceSpecifier:
+            utils.append('var ' + name + ' = ' + modID + ';', state);
+            break;
+          case Syntax.ImportSpecifier:
+            utils.append('var ' + name + ' = ' + modID + '.' + specifier.id.name + ';', state);
+            break;
+            
+      }
+  }
+  else {
+    modID = genID('mod');
+    utils.append('var ' + modID + ' = require(' + node.source.raw + ');', state);
+    for (var i = 0, len = node.specifiers.length; i < len; i++) {
+      specifier = node.specifiers[i];
+      utils.catchupNewlines(specifier.range[0], state);
+      name = specifier.name ? specifier.name.name : specifier.id.name;
+      
+      switch (specifier.type) {
+          case Syntax.ImportDefaultSpecifier:
+            utils.append('var ' + name + ' = ' + modID +  ';', state); // TODO: should import modID.default
+            break;
+          case Syntax.ImportNamespaceSpecifier:
+            utils.append('var ' + name + ' = ' + modID + ';', state);
+            break;
+          case Syntax.ImportSpecifier:
+            utils.append('var ' + name + ' = ' + modID + '.' + specifier.id.name + ';', state);
+            break;
+            
+      }
+      
+    }
+  }
+  
 
+  
+  /*
   switch (node.kind) {
 
     // import "module"
@@ -55,9 +102,10 @@ function visitImportDeclaration(traverse, node, path, state) {
     default:
       assert(false, "don't know how to transform: " + node.kind);
   }
+  */
 
   utils.catchupNewlines(node.range[1], state);
-  utils.move(node.range[1], state);
+  //utils.move(node.range[1], state);
   return false;
 }
 
@@ -80,29 +128,20 @@ function visitExportDeclaration(traverse, node, path, state) {
   utils.catchup(node.range[0], state);
 
   if (node.declaration) {
-
     // export default = value
-    if (Array.isArray(node.declaration)) {
-
-      assert(
-        node.declaration.length === 1,
-        formatError('cannot export more than a single declaration', node));
-
-      name = node.declaration[0].id.name;
-      switch (name) {
-        case 'default':
-          utils.append('module.exports =', state);
-          break;
-        default:
-          utils.append('module.exports.' + name + ' = ', state);
-      }
-
-      if (node.declaration[0].init) {
+    if (node.default) {
+      //traverse(node.declaration, path, state);
+      if (node.declaration.type == Syntax.AssignmentExpression) {
         // -1 compensates for an additional space after '=' token
-        utils.move(node.declaration[0].init.range[0] - 1, state);
-        traverse(node.declaration[0].init, path, state);
+        name = node.declaration.left.name;
+        utils.append('var ' + name + ' = module.exports = ', state);
+        utils.move(node.declaration.right.range[0], state);
+        traverse(node.declaration.right, path, state);
+        utils.move(node.declaration.range[1] - 1, state);
       } else {
-        utils.move(node.range[1], state);
+        utils.append('module.exports = ', state);
+        utils.move(node.declaration.range[0], state);
+        traverse(node.declaration, path, state);
       }
 
 
@@ -117,6 +156,12 @@ function visitExportDeclaration(traverse, node, path, state) {
             utils.append(' = module.exports.' + declaration.id.name, state);
             traverse(declaration.init, path, state);
           });
+          break;
+        case Syntax.Identifier:
+          name = node.declaration.name;
+          utils.move(node.declaration.range[1], state);
+          traverse(node.declaration, path, state);
+          utils.append('module.exports.' + name + ' = ' + name, state);
           break;
         case Syntax.FunctionDeclaration:
           name = node.declaration.id.name;

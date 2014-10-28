@@ -1,7 +1,10 @@
-module.exports.x = x;
-module.exports.x = x;module.exports.y = y;
-module.exports.a = x;
-module.exports.a = x;module.exports.b = y;
+/* jshint esnext:true */
+module.exports.foo = foo;
+module.exports.foo = foo;module.exports.bar = bar;
+module.exports.bar = foo;
+module.exports.bar = foo;module.exports.baz = bar;
+module.exports.default = foo;
+module.exports.default = foo;module.exports.bar = bar;
 
 
 module.exports.a = x;
@@ -10,11 +13,13 @@ module.exports.b = y;
 
 var should = "be on 11th line";
 
-module.exports.x =  11;
+// the following aren't supported anymore
+//export x = 11;
+/*
+export x = class A {
 
-module.exports.x = (function(){function A(){"use strict";}
-
-  A.prototype.render=function() {"use strict";
+  render() {
     return 1;
-  };
-return A;})()
+  }
+}
+*/

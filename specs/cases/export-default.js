@@ -1,8 +1,13 @@
-export default = value;
-export default value;
-
-export default = class A {
-}
+/* jshint esnext:true */
+var foo2;
+export default 42;
+export default function () {}
+export default function foo() {}
+export default class {}
+export default {};
+export default [];
+export default foo2;
+export default value2 = 1;
 
 export default class A {
   method() {
