@@ -8,6 +8,10 @@ function A(){"use strict";}
   A.prototype.foo=function() {"use strict";};
 module.exports.A = A;
 
+for(var B____Key in B){if(B.hasOwnProperty(B____Key)){A[B____Key]=B[B____Key];}}var ____SuperProtoOfB=B===null?null:B.prototype;A.prototype=Object.create(____SuperProtoOfB);A.prototype.constructor=A;A.__superConstructor__=B;function A(){"use strict";if(B!==null){B.apply(this,arguments);}}
+  A.prototype.foo=function() {"use strict";};
+module.exports.A = A;
+
 function x() {
   function A(){"use strict";}
     A.prototype.foo=function() {"use strict";};

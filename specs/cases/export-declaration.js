@@ -8,6 +8,10 @@ export class A {
   foo() {}
 }
 
+export class A extends B {
+  foo() {}
+}
+
 export function x() {
   class A {
     foo() {}
