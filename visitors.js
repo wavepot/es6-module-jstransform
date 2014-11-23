@@ -139,9 +139,15 @@ function visitExportDeclaration(traverse, node, path, state) {
         traverse(node.declaration.right, path, state);
         utils.move(node.declaration.range[1] - 1, state);
       } else {
-        utils.append('module.exports = ', state);
-        utils.move(node.declaration.range[0], state);
-        traverse(node.declaration, path, state);
+        if (node.declaration.id) {
+          utils.move(node.declaration.range[0], state);
+          traverse(node.declaration, path, state);
+          utils.append(' module.exports = ' + node.declaration.id.name, state);
+        } else {
+          utils.append('module.exports = ', state);
+          utils.move(node.declaration.range[0], state);
+          traverse(node.declaration, path, state);
+        }
       }
 
 
