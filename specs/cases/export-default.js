@@ -4,6 +4,7 @@ export default 42;
 export default function () {}
 export default function foo() {}
 export default class {}
+export default class Foo {}
 export default {};
 export default [];
 export default foo2;
