@@ -26,7 +26,7 @@ function visitImportDeclaration(traverse, node, path, state) {
     modID = 'require(' + node.source.raw + ')';
     switch (specifier.type) {
           case Syntax.ImportDefaultSpecifier:
-            utils.append('var ' + name + ' = ' + modID +  ';', state); // TODO: should import modID.default
+            utils.append('var ' + name + ' = ' + modID +  '["default"];', state);
             break;
           case Syntax.ImportNamespaceSpecifier:
             utils.append('var ' + name + ' = ' + modID + ';', state);
@@ -47,7 +47,7 @@ function visitImportDeclaration(traverse, node, path, state) {
       
       switch (specifier.type) {
           case Syntax.ImportDefaultSpecifier:
-            utils.append('var ' + name + ' = ' + modID +  ';', state); // TODO: should import modID.default
+            utils.append('var ' + name + ' = ' + modID +  '["default"];', state);
             break;
           case Syntax.ImportNamespaceSpecifier:
             utils.append('var ' + name + ' = ' + modID + ';', state);
@@ -134,7 +134,7 @@ function visitExportDeclaration(traverse, node, path, state) {
       if (node.declaration.type == Syntax.AssignmentExpression) {
         // -1 compensates for an additional space after '=' token
         name = node.declaration.left.name;
-        utils.append('var ' + name + ' = module.exports = ', state);
+        utils.append('var ' + name + ' = module.exports["default"] = ', state);
         utils.move(node.declaration.right.range[0], state);
         traverse(node.declaration.right, path, state);
         utils.move(node.declaration.range[1] - 1, state);
@@ -142,9 +142,9 @@ function visitExportDeclaration(traverse, node, path, state) {
         if (node.declaration.id) {
           utils.move(node.declaration.range[0], state);
           traverse(node.declaration, path, state);
-          utils.append(' module.exports = ' + node.declaration.id.name, state);
+          utils.append(' module.exports["default"] = ' + node.declaration.id.name, state);
         } else {
-          utils.append('module.exports = ', state);
+          utils.append('module.exports["default"] = ', state);
           utils.move(node.declaration.range[0], state);
           traverse(node.declaration, path, state);
         }
@@ -266,7 +266,7 @@ visitExportDeclaration.test = function(node, path, state) {
  */
 function visitModuleDeclaration(traverse, node, path, state) {
   utils.catchup(node.range[0], state);
-  utils.append('var ' + node.id.name + ' = require(' + node.source.raw + ');', state);
+  utils.append('var ' + node.id.name + ' = require(' + node.source.raw + ')["default"];', state);
   utils.move(node.range[1], state);
   return false;
 }
